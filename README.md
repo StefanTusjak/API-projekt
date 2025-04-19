@@ -26,8 +26,13 @@ Tento projekt slouží jako jednoduchá výuková ukázka propojení **backendu 
 
 ### 🔌 Python knihovny
 
+- Instalace flasku
 ```bash
-pip install flask mysql-connector-python
+pip install flask
+```
+- Pokud nemáš tak instalace knihovny pro MySQL
+```bash
+pip install mysql-connector-python
 ```
 
 ---
