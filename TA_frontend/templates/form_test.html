@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulář s chybami</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+        input, button {
+            padding: 8px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        ul, ol {
+            background: #f9f9f9;
+            padding: 12px;
+            border: 1px solid #ddd;
+            margin-bottom: 24px;
+        }
+        li {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+    <h1>❌ Formulář s chybami</h1>
+
+    <p>
+        Tento formulář slouží pro demonstraci špatného návrhu. Obsahuje záměrné chyby pro testování validací a reakce backendu.
+    </p>
+
+    <h3>🔍 Co je špatně?</h3>
+    <ul>
+        <li>❌ Žádná HTML validace (`required`, `type="email"`, atd.)</li>
+        <li>❌ Uživatel může odeslat prázdný formulář</li>
+        <li>❌ Nezobrazuje se žádná zpětná vazba (chybová/úspěšná hláška)</li>
+        <li>❌ Duplicitní e-maily nejsou ošetřeny v UI</li>
+    </ul>
+
+    <h3>🧪 Úkoly pro testování:</h3>
+    <ol>
+        <li>Odešli formulář bez vyplnění polí – co se stane?</li>
+        <li>Zadej e-mail bez zavináče – projde to?</li>
+        <li>Zkus odeslat vícekrát stejný e-mail – jak reaguje backend?</li>
+        <li>Zkus formulář odeslat a zjistit, zda vidíš odpověď</li>
+        <li>Otevři konzoli (F12) a sleduj síťové požadavky</li>
+    </ol>
+
+    <form id="brokenForm">
+        <label for="jmeno">Jméno (bez validace):</label>
+        <input type="text" id="jmeno" name="jmeno">
+
+        <label for="email">E-mail (chybně jako text):</label>
+        <input type="text" id="email" name="email">
+
+        <button type="submit">Odeslat</button>
+    </form>
+
+    <!-- Žádná zpětná vazba – to je účel -->
+    <p><em>Po odeslání nedojde k žádnému oznámení o úspěchu či chybě.</em></p>
+
+    <p><a href="/">⬅️ Přejít na správný formulář</a></p>
+
+    <script>
+        const form = document.getElementById('brokenForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                jmeno: form.jmeno.value,
+                email: form.email.value
+            };
+
+            // Záměrně: bez jakékoli zpětné vazby nebo kontroly odpovědi
+            await fetch("/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            // Uživatel neví, jestli byl požadavek úspěšný
+        });
+    </script>
+</body>
+</html>

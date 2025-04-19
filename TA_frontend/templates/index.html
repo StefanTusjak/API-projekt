@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Přidat uživatele</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        input, button {
+            padding: 8px;
+            margin-top: 4px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        .delete-btn {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <p><a href="/form-test">⬅️ Přejít na chybný formulář</a></p>
+    <h1>Vyhledání uživatele podle jména</h1>
+    <input type="text" id="search" placeholder="Hledat uživatele...">
+    <button onclick="loadUsers(document.getElementById('search').value)">Hledat</button>
+
+    <h1>Přidat nového uživatele</h1>
+    <form id="userForm">
+        <label for="jmeno">Jméno:</label>
+        <input type="text" id="jmeno" name="jmeno" required>
+
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
+
+        <button type="submit">Odeslat</button>
+    </form>
+
+    <p id="responseMessage"></p>
+
+    <button onclick="loadUsers()">📄 Zobrazit uživatele</button>
+
+    <div id="userList">
+        <h2>Upravit uživatele</h2>
+        <form id="editForm" style="display: none;">
+            <input type="hidden" id="editId">
+            <label for="editJmeno">Jméno:</label>
+            <input type="text" id="editJmeno"><br><br>
+
+            <label for="editEmail">E-mail:</label>
+            <input type="email" id="editEmail"><br><br>
+
+            <button type="submit">Uložit změny</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('userForm');
+        const responseMsg = document.getElementById('responseMessage');
+        const userList = document.getElementById('userList');
+    
+        const editForm = document.getElementById('editForm');
+        const editId = document.getElementById('editId');
+        const editJmeno = document.getElementById('editJmeno');
+        const editEmail = document.getElementById('editEmail');
+    
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                jmeno: form.jmeno.value,
+                email: form.email.value
+            };
+    
+            try {
+                const response = await fetch("/users", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+    
+                const result = await response.json();
+                if (response.ok) {
+                    responseMsg.style.color = "green";
+                    responseMsg.innerText = result.message;
+                    form.reset();
+                    loadUsers();
+                } else {
+                    responseMsg.style.color = "red";
+                    responseMsg.innerText = result.error || "Chyba při odesílání.";
+                }
+            } catch (error) {
+                responseMsg.style.color = "red";
+                responseMsg.innerText = "Došlo k chybě: " + error.message;
+            }
+        });
+    
+        async function loadUsers(search = "") {
+            const response = await fetch(`/users?search=${encodeURIComponent(search)}`);
+            const users = await response.json();
+
+            if (Array.isArray(users)) {
+                let html = `<table>
+                    <tr><th>ID</th><th>Jméno</th><th>E-mail</th><th>Akce</th></tr>`;
+
+                users.forEach(user => {
+                    html += `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.jmeno}</td>
+                            <td>${user.email}</td>
+                            <td>
+                                <button class="delete-btn" onclick="deleteUser(${user.id})">Smazat</button>
+                                <button onclick="editUser(${user.id}, '${user.jmeno}', '${user.email}')">Upravit</button>
+                            </td>
+                        </tr>`;
+                });
+
+                html += `</table>`;
+                userList.innerHTML = html;
+            } else {
+                userList.innerHTML = "<p>Žádní uživatelé nenalezeni.</p>";
+            }
+        }
+    
+        async function deleteUser(id) {
+            if (confirm("Opravdu chceš smazat tohoto uživatele?")) {
+                const response = await fetch(`/users/${id}`, { method: "DELETE" });
+                const result = await response.json();
+                alert(result.message);
+                loadUsers();
+            }
+        }
+    
+        function editUser(id, jmeno, email) {
+            editForm.style.display = "block";
+            editId.value = id;
+            editJmeno.value = jmeno;
+            editEmail.value = email;
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    
+        editForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const id = editId.value;
+            const data = {
+                jmeno: editJmeno.value,
+                email: editEmail.value
+            };
+    
+            const response = await fetch(`/users/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+    
+            const result = await response.json();
+            alert(result.message || result.error);
+            editForm.reset();
+            editForm.style.display = "none";
+            loadUsers();
+        });
+    
+        // načti uživatele při prvním kliknutí
+        async function init() {
+            // Nevolá se automaticky, zůstává „na tlačítko“
+        }
+    </script>
+    
+</body>
+</html>
