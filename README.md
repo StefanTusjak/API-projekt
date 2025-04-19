@@ -126,16 +126,6 @@ python test_api.py
 
 ---
 
-## 🧠 Rozšíření (volitelné)
-
-- Export do CSV
-- Přihlášení (token, role)
-- Statistiky (počet uživatelů)
-- Reset databáze pro testování
-- Postman kolekce pro studenty
-
----
-
 ## 📬 Kontakt / Autor
 
 Projekt pro výuku v rámci kurzu testování s Pythonem.  
