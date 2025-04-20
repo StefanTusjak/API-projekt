@@ -39,7 +39,7 @@ pip install mysql-connector-python
 
 ## 🛠 Nastavení databáze
 
-1. Vytvoř si databázi `student`:
+1. Vytvoř si databázi ve Workbench `student`:
 
 ```sql
 CREATE DATABASE student;
@@ -59,22 +59,23 @@ CREATE TABLE uzivatele (
 
 ## 🚀 Jak to spustit
 
-1. Ujisti se, že v souboru `api.py` máš správně nastaveno připojení k MySQL:
+1. Ujisti se, žev souboru `api.py` máš správně nastaveno připojení k MySQL a ujisti se, že se nacházíš v souboru api.py:
 
 ```python
 db = mysql.connector.connect(
     host="localhost",
     user="root",       # uprav podle svého
-    password="1111",   # uprav podle svého
+    password="",   # uprav podle svého
     database="student"
 )
 ```
 
 2. Spusť Flask server:
-
+- Buď příkazem: 
 ```bash
 python api.py
 ```
+- nebo šipkou vpravo nahoře 
 
 3. Otevři prohlížeč:
 
